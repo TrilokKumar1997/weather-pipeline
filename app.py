@@ -12,22 +12,11 @@ st.set_page_config(
 
 @st.cache_resource
 def get_engine():
-    try:
-        host = st.secrets["DB_HOST"]
-        port = st.secrets["DB_PORT"]
-        dbname = st.secrets["DB_NAME"]
-        user = st.secrets["DB_USER"]
-        password = st.secrets["DB_PASSWORD"]
-    except:
-        import os
-        from dotenv import load_dotenv
-        load_dotenv()
-        host = os.getenv("DB_HOST")
-        port = os.getenv("DB_PORT")
-        dbname = os.getenv("DB_NAME")
-        user = os.getenv("DB_USER")
-        password = os.getenv("DB_PASSWORD")
-
+    host = "aws-1-us-east-1.pooler.supabase.com"
+    port = 5432
+    dbname = "postgres"
+    user = "postgres.cffhrrrahylfushjparq"
+    password = "WeatherDB2024!"
     url = f"postgresql://{user}:{password}@{host}:{port}/{dbname}"
     return create_engine(url)
 
@@ -148,7 +137,7 @@ try:
 
 except Exception as e:
     st.error(f"Database connection error: {e}")
-    st.info("Make sure PostgreSQL is running and the pipeline has been executed at least once.")
+    st.info("Make sure the pipeline has been executed at least once.")
 
 st.divider()
 st.caption("Built by Trilok Kumar · Data Science MS, University of New Haven · Stack: Python · PostgreSQL · Streamlit · Open-Meteo API")
