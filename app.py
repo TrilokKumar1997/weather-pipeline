@@ -2,11 +2,7 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 from sqlalchemy import create_engine
-from dotenv import load_dotenv
-import os
 from datetime import datetime
-
-load_dotenv()
 
 st.set_page_config(
     page_title="Global Weather Pipeline",
@@ -16,7 +12,23 @@ st.set_page_config(
 
 @st.cache_resource
 def get_engine():
-    url = f"postgresql://{os.getenv('DB_USER')}:{os.getenv('DB_PASSWORD')}@{os.getenv('DB_HOST')}:{os.getenv('DB_PORT')}/{os.getenv('DB_NAME')}"
+    try:
+        host = st.secrets["DB_HOST"]
+        port = st.secrets["DB_PORT"]
+        dbname = st.secrets["DB_NAME"]
+        user = st.secrets["DB_USER"]
+        password = st.secrets["DB_PASSWORD"]
+    except:
+        import os
+        from dotenv import load_dotenv
+        load_dotenv()
+        host = os.getenv("DB_HOST")
+        port = os.getenv("DB_PORT")
+        dbname = os.getenv("DB_NAME")
+        user = os.getenv("DB_USER")
+        password = os.getenv("DB_PASSWORD")
+
+    url = f"postgresql://{user}:{password}@{host}:{port}/{dbname}"
     return create_engine(url)
 
 @st.cache_data(ttl=300)
@@ -53,10 +65,10 @@ try:
     history = load_history()
 
     col1, col2, col3, col4 = st.columns(4)
-    col1.metric("Cities tracked",   f"{len(latest)}")
-    col2.metric("Avg temperature",  f"{latest['temperature'].mean():.1f}°C")
-    col3.metric("Avg humidity",     f"{latest['humidity'].mean():.0f}%")
-    col4.metric("Total records",    f"{len(history):,}")
+    col1.metric("Cities tracked",  f"{len(latest)}")
+    col2.metric("Avg temperature", f"{latest['temperature'].mean():.1f}°C")
+    col3.metric("Avg humidity",    f"{latest['humidity'].mean():.0f}%")
+    col4.metric("Total records",   f"{len(history):,}")
     st.divider()
 
     st.subheader("Current temperature by city")
